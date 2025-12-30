@@ -14,24 +14,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import React, { FormEventHandler, useState } from "react";
+import Dropdown from "./Dropdown";
 
 export enum Subjects {
-    PHYSICS,
-    CHEMITRY,
-    BIOLOGY
+  PHYSICS = "physics",
+  CHEMITRY = "chemistry",
+  BIOLOGY = "biology",
 }
 
 interface SelectSubjectDialogProps {
+  isOpen: boolean;
+  setIsOpen: (e : boolean) => void;
   onClose: () => void;
-  onSubmit: (data:Subjects | null) => FormEventHandler | undefined;
+  onSubmit: (data: Subjects | null) => FormEventHandler | undefined;
 }
 
 const SelectSubjectDialog = ({
+  isOpen,
+  setIsOpen,
   onClose,
   onSubmit,
 }: SelectSubjectDialogProps) => {
   const [subject, setSubject] = useState<Subjects | null>(Subjects.PHYSICS);
-  const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog
       open={isOpen}
@@ -42,33 +46,48 @@ const SelectSubjectDialog = ({
         }
       }}
     >
-      <form onSubmit={(e) => {onSubmit(subject)}}>
+      <form
+        onSubmit={(e) => {
+          onSubmit(subject);
+        }}
+      >
         <DialogTrigger asChild>
-          <Button variant="outline" onClick={()=>{setIsOpen(true)}}>Open Dialog</Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+                setIsOpen(true)
+            }}
+          >
+            See Simulations
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>Select Subject</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
+              Select the subject to see the available simulations
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label htmlFor="name-1">Name</Label>
-              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="username-1">Username</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
+              <Label htmlFor="name-1">Subject</Label>
+              <Dropdown subject={subject} setSubject={setSubject} />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={() => {
+                onSubmit(subject)
+            }}>Continue</Button>
           </DialogFooter>
         </DialogContent>
       </form>
