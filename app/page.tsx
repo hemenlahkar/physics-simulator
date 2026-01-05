@@ -1,8 +1,8 @@
 "use client";
-import SelectSubjectDialog from "@/modules/simulations/components/SelectSubjectDialog";
+import SelectSubjectDialog from "@/components/home/SelectSubjectDialog";
 import Image from "next/image";
 import { FormEventHandler, useState } from "react";
-import { Subjects } from "@/modules/simulations/components/SelectSubjectDialog";
+import { Subjects } from "@/components/home/SelectSubjectDialog";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
