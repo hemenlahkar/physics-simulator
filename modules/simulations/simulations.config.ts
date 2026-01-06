@@ -66,6 +66,15 @@ export const simulations: Simulation[] = [
   //   difficulty: "intermediate",
   //   controls: ["Drag Points", "Adjust Wind", "T to Tear"],
   // },
+    {
+      id: "newton-cradle",
+      name: "Newton's Cradle",
+      description: "",
+      component: dynamic(()=>import("./NewtonsCradle"), {ssr: false}),
+      category: "Collision",
+      difficulty: "beginner",
+      controls: ["Drag points"]
+    }
 ] as const;
 
 export type SimulationId = (typeof simulations)[number]["id"];
