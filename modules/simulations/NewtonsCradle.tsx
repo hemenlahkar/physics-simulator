@@ -35,7 +35,7 @@ export default function NewtonsCradle() {
       fov: 60,
       nearPlane: 0.1,
       farPlane: 1000,
-      cameraPosition: { x: 0, y: 0, z: 8 },
+      cameraPosition: { x: 0, y: 3, z: 8 },
       enableShadows: true,
       enableControls: false,
       backgroundColor: 0xf0f0f0,
@@ -44,13 +44,12 @@ export default function NewtonsCradle() {
       directionalLightPosition: { x: 5, y: 10, z: 5 },
     });
 
-    const axesHelper = new AxesHelper(50);
-    sceneInit.scene.add(axesHelper);
-
     if (!sceneInit.initialize()) {
       console.error("Failed to initialize scene");
       return;
     }
+
+    sceneInit.camera.lookAt(new THREE.Vector3(0, 3, 0));
 
     sceneInitRef.current = sceneInit;
 
@@ -172,12 +171,12 @@ export default function NewtonsCradle() {
     constraintsRef.current = constraints;
 
     // Pull back first ball to start motion
-    bodies[0].position.x -= 1.5;
-    bodies[0].position.y += 1;
-    bodies[1].position.x -= 1.5;
-    bodies[1].position.y += 1;
-    bodies[2].position.x -= 1.5;
-    bodies[2].position.y += 1;
+    // bodies[0].position.x -= 1.5;
+    // bodies[0].position.y += 1;
+    // bodies[1].position.x -= 1.5;
+    // bodies[1].position.y += 1;
+    // bodies[2].position.x -= 1.5;
+    // bodies[2].position.y += 1;
 
     // Mouse interaction
     const raycaster = new THREE.Raycaster();
