@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import SceneInit from "@/lib/threeUtils";
 import {
   Body,
@@ -23,8 +23,9 @@ import {
 // import CannonDebugger from "cannon-es-debugger";
 
 const CarSimulation = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    const test = new SceneInit("car-simulation-canvas");
+    const test = new SceneInit({canvas: canvasRef.current as HTMLCanvasElement});
     test.initialize();
     test.animate();
 
@@ -215,7 +216,7 @@ const CarSimulation = () => {
   }, []);
   return (
     <main>
-      <canvas id="car-simulation-canvas"></canvas>
+      <canvas ref={canvasRef} id="car-simulation-canvas"></canvas>
     </main>
   );
 };

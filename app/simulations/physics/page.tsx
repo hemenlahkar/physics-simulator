@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   simulations,
@@ -33,7 +33,7 @@ import {
 
 function LoadingFallback() {
   return (
-    <div className="fixed inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-xl text-gray-300">Loading Physics Engine...</p>
@@ -106,7 +106,12 @@ function SimulationSelectionPanel({
           className="w-full"
           onValueChange={setSelectedCategory}
         >
-          <TabsList className="grid grid-cols-4 mb-4">
+          <TabsList
+            className={`grid grid-cols-${Math.min(
+              categories.length + 1,
+              4
+            )} mb-4`}
+          >
             <TabsTrigger value="all">All</TabsTrigger>
             {categories.map((category) => (
               <TabsTrigger key={category} value={category}>
@@ -116,7 +121,7 @@ function SimulationSelectionPanel({
           </TabsList>
         </Tabs>
 
-        <div className="space-y-3 max-h-100 overflow-y-auto pr-2">
+        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
           {filteredSimulations.map((simulation) => (
             <Card
               key={simulation.id}
@@ -195,6 +200,9 @@ function SimulationControls({
   const [isPlaying, setIsPlaying] = useState(true);
   const [gravity, setGravity] = useState(9.8);
   const [speed, setSpeed] = useState(1);
+  const [collisionEnabled, setCollisionEnabled] = useState(true);
+  const [showTrails, setShowTrails] = useState(false);
+  const [showForces, setShowForces] = useState(true);
 
   return (
     <div className="absolute right-8 top-8 w-80 bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-800 p-6 z-50 shadow-2xl">
@@ -294,49 +302,48 @@ function SimulationControls({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400">Collision Detection</span>
-              <div className="relative inline-block w-12 h-6">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  id="collision"
-                  defaultChecked
+              <button
+                onClick={() => setCollisionEnabled(!collisionEnabled)}
+                className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                  collisionEnabled ? "bg-blue-500" : "bg-gray-700"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    collisionEnabled ? "translate-x-6" : "translate-x-1"
+                  }`}
                 />
-                <label
-                  htmlFor="collision"
-                  className="block w-12 h-6 bg-gray-700 rounded-full cursor-pointer"
-                >
-                  <span className="block w-6 h-6 bg-blue-500 rounded-full transform transition-transform translate-x-6"></span>
-                </label>
-              </div>
+              </button>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400">Show Trails</span>
-              <div className="relative inline-block w-12 h-6">
-                <input type="checkbox" className="sr-only" id="trails" />
-                <label
-                  htmlFor="trails"
-                  className="block w-12 h-6 bg-gray-700 rounded-full cursor-pointer"
-                >
-                  <span className="block w-6 h-6 bg-gray-500 rounded-full transform transition-transform"></span>
-                </label>
-              </div>
+              <button
+                onClick={() => setShowTrails(!showTrails)}
+                className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                  showTrails ? "bg-blue-500" : "bg-gray-700"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    showTrails ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400">Show Forces</span>
-              <div className="relative inline-block w-12 h-6">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  id="forces"
-                  defaultChecked
+              <button
+                onClick={() => setShowForces(!showForces)}
+                className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                  showForces ? "bg-purple-500" : "bg-gray-700"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    showForces ? "translate-x-6" : "translate-x-1"
+                  }`}
                 />
-                <label
-                  htmlFor="forces"
-                  className="block w-12 h-6 bg-gray-700 rounded-full cursor-pointer"
-                >
-                  <span className="block w-6 h-6 bg-purple-500 rounded-full transform transition-transform translate-x-6"></span>
-                </label>
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -362,21 +369,24 @@ function SimulationHeader({ simulation }: { simulation: Simulation }) {
   );
 }
 
-export default function PhysicsSimulationsPage() {
+function PhysicsSimulationsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const selectedId = searchParams.get("sim") || "";
   const selectedSimulation = simulations.find((s) => s.id === selectedId);
 
-  const handleSelectSimulation = (id: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (id) {
-      params.set("sim", id);
-    } else {
-      params.delete("sim");
-    }
-    router.push(`/simulations/physics?${params.toString()}`);
-  };
+  const handleSelectSimulation = useCallback(
+    (id: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (id) {
+        params.set("sim", id);
+      } else {
+        params.delete("sim");
+      }
+      router.push(`/simulations/physics?${params.toString()}`);
+    },
+    [searchParams, router]
+  );
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -391,10 +401,10 @@ export default function PhysicsSimulationsPage() {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [selectedSimulation]);
+  }, [selectedSimulation, handleSelectSimulation]);
 
   return (
-    <div className="fixed inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
       {/* Background grid */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -414,8 +424,8 @@ export default function PhysicsSimulationsPage() {
             key={i}
             className="absolute w-px h-px bg-white rounded-full animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${Math.floor(Math.random() * 100)}%`,
+              top: `${Math.floor(Math.random() * 100)}%`,
               animationDelay: `${Math.random() * 5}s`,
               opacity: Math.random() * 0.5 + 0.1,
             }}
@@ -423,27 +433,25 @@ export default function PhysicsSimulationsPage() {
         ))}
       </div>
 
-      <Suspense fallback={<LoadingFallback />}>
-        {selectedSimulation ? (
-          <>
-            <SimulationHeader simulation={selectedSimulation} />
-            <SimulationControls
-              simulation={selectedSimulation}
-              onClose={() => handleSelectSimulation("")}
-            />
-
-            {/* Main Simulation Area */}
-            <div className="absolute inset-0">
-              <selectedSimulation.component />
-            </div>
-          </>
-        ) : (
-          <SimulationSelectionPanel
-            onSelectSimulation={handleSelectSimulation}
-            selectedId={selectedId}
+      {selectedSimulation ? (
+        <>
+          <SimulationHeader simulation={selectedSimulation} />
+          <SimulationControls
+            simulation={selectedSimulation}
+            onClose={() => handleSelectSimulation("")}
           />
-        )}
-      </Suspense>
+
+          {/* Main Simulation Area */}
+          <div className="absolute inset-0">
+            <selectedSimulation.component />
+          </div>
+        </>
+      ) : (
+        <SimulationSelectionPanel
+          onSelectSimulation={handleSelectSimulation}
+          selectedId={selectedId}
+        />
+      )}
 
       {/* Bottom Info Bar */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900/50 backdrop-blur-xl rounded-full px-6 py-2 border border-gray-800">
@@ -471,5 +479,14 @@ export default function PhysicsSimulationsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Wrap the component that uses useSearchParams in Suspense
+export default function PhysicsSimulationsPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PhysicsSimulationsContent />
+    </Suspense>
   );
 }

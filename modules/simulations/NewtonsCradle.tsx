@@ -3,23 +3,81 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
-import SceneInit from "@/lib/threeUtils";
-import { AxesHelper } from "three";
+
+// Simplified SceneInit for this example
+class SceneInit {
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  renderer: THREE.WebGLRenderer;
+  animationId: number | null = null;
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xf0f0f0);
+
+    this.camera = new THREE.PerspectiveCamera(
+      60,
+      canvas.clientWidth / canvas.clientHeight,
+      0.1,
+      1000
+    );
+    this.camera.position.set(0, 3, 8);
+    this.camera.lookAt(0, 3, 0);
+
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    this.renderer.shadowMap.enabled = true;
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    this.scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 10, 5);
+    directionalLight.castShadow = true;
+    this.scene.add(directionalLight);
+
+    // Handle resize
+    window.addEventListener("resize", () => this.onResize(canvas));
+  }
+
+  onResize(canvas: HTMLCanvasElement) {
+    this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  }
+
+  animate(callback: (delta: number) => void) {
+    let lastTime = performance.now();
+    const animateLoop = () => {
+      const currentTime = performance.now();
+      const delta = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
+      callback(delta);
+      this.renderer.render(this.scene, this.camera);
+      this.animationId = requestAnimationFrame(animateLoop);
+    };
+    animateLoop();
+  }
+
+  dispose() {
+    if (this.animationId) cancelAnimationFrame(this.animationId);
+    this.renderer.dispose();
+  }
+}
 
 export default function NewtonsCradle() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneInitRef = useRef<SceneInit | null>(null);
 
-  // State for UI updates
   const [selectedBall, setSelectedBall] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Refs for event handlers (to capture latest state)
   const isDraggingRef = useRef(false);
   const selectedBallRef = useRef<number | null>(null);
   const draggedConstraintRef = useRef<CANNON.Constraint | null>(null);
 
-  // Refs for Three.js and Cannon.js objects
   const ballsRef = useRef<THREE.Mesh[]>([]);
   const bodiesRef = useRef<CANNON.Body[]>([]);
   const stringLinesRef = useRef<THREE.Line[]>([]);
@@ -29,45 +87,41 @@ export default function NewtonsCradle() {
   useEffect(() => {
     if (!canvasRef.current || sceneInitRef.current) return;
 
-    // Initialize scene with utility class
-    const sceneInit = new SceneInit({
-      canvas: canvasRef.current, // Use the canvas element directly
-      fov: 60,
-      nearPlane: 0.1,
-      farPlane: 1000,
-      cameraPosition: { x: 0, y: 3, z: 8 },
-      enableShadows: true,
-      enableControls: false,
-      backgroundColor: 0xf0f0f0,
-      ambientLightIntensity: 0.6,
-      directionalLightIntensity: 1,
-      directionalLightPosition: { x: 5, y: 10, z: 5 },
-    });
-
-    if (!sceneInit.initialize()) {
-      console.error("Failed to initialize scene");
-      return;
-    }
-
-    sceneInit.camera.lookAt(new THREE.Vector3(0, 3, 0));
-
+    const sceneInit = new SceneInit(canvasRef.current);
     sceneInitRef.current = sceneInit;
 
-    // Physics world
+    // Physics world with OPTIMIZED settings
     const world = new CANNON.World();
     world.gravity.set(0, -9.82, 0);
+
+    // CRITICAL: High solver iterations for stable collisions
+    (world.solver as CANNON.GSSolver).iterations = 30; // Increased from default 10
+    (world.solver as CANNON.GSSolver).tolerance = 0; // Set to 0 for maximum accuracy
+
+    // IMPORTANT: Use Split solver for better stability
+    const solver = new CANNON.GSSolver();
+    solver.iterations = 30;
+    solver.tolerance = 0;
+    world.solver = solver;
+
+    // Allow sleeping for performance, but with stricter thresholds
+    world.allowSleep = true;
+    // world.sleepSpeedLimit = 0.01; // Lower threshold
+    // world.sleepTimeLimit = 0.5; // Shorter time before sleep
+
     worldRef.current = world;
 
+    // CRITICAL: Contact material with very high stiffness
     const ballMaterial = new CANNON.Material("ballMaterial");
     const ballContactMaterial = new CANNON.ContactMaterial(
       ballMaterial,
       ballMaterial,
       {
-        friction: 0.05,
-        restitution: 1.0,
-        contactEquationStiffness: 1e6,
+        friction: 0.0, // Zero friction for ideal transfer
+        restitution: 0.999, // Slightly less than 1.0 for stability
+        contactEquationStiffness: 1e10, // VERY high stiffness
         contactEquationRelaxation: 3,
-        frictionEquationStiffness: 1e8,
+        frictionEquationStiffness: 1e10,
       }
     );
     world.addContactMaterial(ballContactMaterial);
@@ -76,7 +130,7 @@ export default function NewtonsCradle() {
     const numBalls = 5;
     const ballRadius = 0.3;
     const stringLength = 3;
-    const spacing = ballRadius * 2.01;
+    const spacing = ballRadius * 2.005; // Tiny gap to prevent initial contact
 
     const balls: THREE.Mesh[] = [];
     const bodies: CANNON.Body[] = [];
@@ -114,8 +168,8 @@ export default function NewtonsCradle() {
       const geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
       const material = new THREE.MeshStandardMaterial({
         color: 0x2196f3,
-        metalness: 0.7,
-        roughness: 0.01,
+        metalness: 1,
+        roughness: 0.000001,
       });
       const ball = new THREE.Mesh(geometry, material);
       ball.castShadow = true;
@@ -123,32 +177,35 @@ export default function NewtonsCradle() {
       sceneInit.scene.add(ball);
       balls.push(ball);
 
-      // Cannon.js body
+      // Cannon.js body with OPTIMIZED settings
       const shape = new CANNON.Sphere(ballRadius);
       const body = new CANNON.Body({
-        mass: 1,
+        mass: 1, // Use mass 1 for numerical stability
         shape: shape,
         position: new CANNON.Vec3(x, 5 - stringLength, 0),
         material: ballMaterial,
-        linearDamping: 0.05,
-        angularDamping: 0.05,
+        linearDamping: 0.0, // Zero damping
+        angularDamping: 0.0, // Zero damping
         collisionResponse: true,
+        sleepSpeedLimit: 0.01,
+        sleepTimeLimit: 0.5,
       });
       world.addBody(body);
       bodies.push(body);
 
-      // String constraint
+      // String constraint with VERY HIGH stiffness
       const pivotPoint = new CANNON.Body({
         mass: 0,
         position: new CANNON.Vec3(x, 5, 0),
       });
       world.addBody(pivotPoint);
 
+      // IMPORTANT: Use higher maxForce for stiffer strings
       const constraint = new CANNON.DistanceConstraint(
         body,
         pivotPoint,
         stringLength,
-        1e4
+        1e8 // Very high force to minimize stretching
       );
       world.addConstraint(constraint);
       constraints.push(constraint);
@@ -164,19 +221,14 @@ export default function NewtonsCradle() {
       stringLines.push(stringLine);
     }
 
-    // Store refs for cleanup and event handlers
     ballsRef.current = balls;
     bodiesRef.current = bodies;
     stringLinesRef.current = stringLines;
     constraintsRef.current = constraints;
 
     // Pull back first ball to start motion
-    // bodies[0].position.x -= 1.5;
-    // bodies[0].position.y += 1;
-    // bodies[1].position.x -= 1.5;
-    // bodies[1].position.y += 1;
-    // bodies[2].position.x -= 1.5;
-    // bodies[2].position.y += 1;
+    bodies[0].position.x -= 1.5;
+    bodies[0].position.y += 1;
 
     // Mouse interaction
     const raycaster = new THREE.Raycaster();
@@ -197,7 +249,6 @@ export default function NewtonsCradle() {
           intersects[0].object as THREE.Mesh
         );
 
-        // Update both state and refs
         setIsDragging(true);
         isDraggingRef.current = true;
         setSelectedBall(ballIndex);
@@ -210,7 +261,6 @@ export default function NewtonsCradle() {
     };
 
     const onMouseMove = (event: MouseEvent) => {
-      // Use refs for state in event handler
       if (!isDraggingRef.current || selectedBallRef.current === null) {
         return;
       }
@@ -225,34 +275,20 @@ export default function NewtonsCradle() {
       const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
       const intersectPoint = new THREE.Vector3();
 
-      // Check if ray intersects the plane
       if (raycaster.ray.intersectPlane(plane, intersectPoint)) {
         const ballIndex = selectedBallRef.current;
         const body = bodiesRef.current[ballIndex];
-        const maxDist = stringLength * 0.9;
-        const pivotX = (ballIndex - (numBalls - 1) / 2) * spacing;
-        const dx = intersectPoint.x - pivotX;
-        const dy = intersectPoint.y - 5;
-        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // if (dist > maxDist) {
-        //   const scale = maxDist / dist;
-        //   body.position.x = pivotX + dx * scale;
-        //   body.position.y = 5 + dy * scale;
-        // } else {
         body.position.x = intersectPoint.x;
         body.position.y = intersectPoint.y;
-        // }
 
-        // Reset velocity when dragging
         body.velocity.set(0, 0, 0);
         body.angularVelocity.set(0, 0, 0);
-        body.wakeUp(); // Wake up the body if it was sleeping
+        body.wakeUp();
       }
     };
 
     const onMouseUp = () => {
-      // Re-enable the constraint when releasing
       if (draggedConstraintRef.current) {
         world.addConstraint(draggedConstraintRef.current);
         draggedConstraintRef.current = null;
@@ -269,23 +305,22 @@ export default function NewtonsCradle() {
     canvasElement.addEventListener("mousemove", onMouseMove);
     canvasElement.addEventListener("mouseup", onMouseUp);
 
-    // Custom animation loop with physics
+    // Animation loop with SMALLER time step
     const animateWithPhysics = (delta: number) => {
-      // Fixed time step for stable physics
-      const fixedTimeStep = 1 / 120;
-      const maxSubSteps = 10;
+      // CRITICAL: Smaller fixed time step for better accuracy
+      const fixedTimeStep = 1 / 240; // Increased from 1/120
+      const maxSubSteps = 20; // Increased for catching up
 
-      // Update physics with fixed time step
-      world.step(fixedTimeStep, delta, maxSubSteps);
+      // Clamp delta to prevent spiral of death
+      const clampedDelta = Math.min(delta, 0.1);
 
-      // Update ball positions and strings
+      world.step(fixedTimeStep, clampedDelta, maxSubSteps);
+
       ballsRef.current.forEach((ball, i) => {
         const cannonPos = bodiesRef.current[i].position;
 
-        // Update Three.js ball position
         ball.position.set(cannonPos.x, cannonPos.y, cannonPos.z);
 
-        // Update ball rotation
         const cannonQuat = bodiesRef.current[i].quaternion;
         ball.quaternion.set(
           cannonQuat.x,
@@ -294,7 +329,6 @@ export default function NewtonsCradle() {
           cannonQuat.w
         );
 
-        // Update string visualization
         const pivotX = (i - (numBalls - 1) / 2) * spacing;
         const positions = new Float32Array([
           pivotX,
@@ -317,26 +351,21 @@ export default function NewtonsCradle() {
     sceneInit.animate(animateWithPhysics);
 
     return () => {
-      // Remove event listeners
       const canvasElement = sceneInit.renderer.domElement;
       canvasElement.removeEventListener("mousedown", onMouseDown);
       canvasElement.removeEventListener("mousemove", onMouseMove);
       canvasElement.removeEventListener("mouseup", onMouseUp);
 
-      // Clean up physics
       if (worldRef.current) {
-        // Remove constraints
         constraintsRef.current.forEach((constraint) => {
           worldRef.current?.removeConstraint(constraint);
         });
 
-        // Remove bodies
         bodiesRef.current.forEach((body) => {
           worldRef.current?.removeBody(body);
         });
       }
 
-      // Clean up Three.js objects
       ballsRef.current.forEach((ball) => {
         ball.geometry.dispose();
         (ball.material as THREE.Material).dispose();
@@ -349,20 +378,17 @@ export default function NewtonsCradle() {
         sceneInit.scene.remove(line);
       });
 
-      // Clear arrays
       ballsRef.current = [];
       bodiesRef.current = [];
       stringLinesRef.current = [];
       constraintsRef.current = [];
 
-      // Dispose scene
       sceneInit.dispose();
       sceneInitRef.current = null;
       worldRef.current = null;
     };
   }, []);
 
-  // Update cursor based on dragging state
   const cursorStyle = isDragging ? "grabbing" : "grab";
 
   return (
