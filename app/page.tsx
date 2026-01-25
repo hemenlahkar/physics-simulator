@@ -34,7 +34,7 @@ export default function Home() {
         />
         <section className="text-center w-full">
           <h1 className="text-7xl ">
-            Explore Science Through
+            Explore Science Through{" "}
             <span className="text-orange-400">Interactive Simulations</span>
           </h1>
           <p>
