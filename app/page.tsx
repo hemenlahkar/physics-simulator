@@ -95,7 +95,9 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="flex items-center justify-start gap-10 h-screen flex-col">
+      <main
+      className="flex items-center justify-start gap-10 min-h-screen flex-col flex-1"
+      >
         <SelectSubjectDialog
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
@@ -143,24 +145,32 @@ export default function Home() {
               <ol className="min-h-125 flex flex-col justify-evenly mx-5 text-2xl">
                 <hr />
                 <li>
-                  <span className="font-bold text-gray-600 mr-8">01</span>See
-                  the Bigger Picture of Learning Through Interactive
+                  <span className="font-bold text-xl text-gray-600 mr-8">
+                    01
+                  </span>
+                  See the Bigger Picture of Learning Through Interactive
                   Exploration.
                 </li>
                 <hr />
                 <li>
-                  <span className="font-bold text-gray-600 mr-8">02</span>
+                  <span className="font-bold text-xl text-gray-600 mr-8">
+                    02
+                  </span>
                   Understand Concepts Clearly by Visualizing How They Actually
                   Work.
                 </li>
                 <hr />
                 <li>
-                  <span className="font-bold text-gray-600 mr-8">03</span>Move
-                  Beyond Memorization and Learn Through Real Understanding.
+                  <span className="font-bold text-xl text-gray-600 mr-8">
+                    03
+                  </span>
+                  Move Beyond Memorization and Learn Through Real Understanding.
                 </li>
                 <hr />
                 <li>
-                  <span className="font-bold text-gray-600 mr-8">04</span>
+                  <span className="font-bold text-xl text-gray-600 mr-8">
+                    04
+                  </span>
                   Experience Learning by Exploring Concepts Step by Step.
                 </li>
                 <hr />
@@ -175,73 +185,110 @@ export default function Home() {
             </aside>
           </div>
         </section>
-        <section id="features-section" className="">
-          <h4 className="text-center">Features</h4>
-          <h1 className="text-center">Why choose SimuLearn?</h1>
-          <p>
-            Designed with students in mind, our platform makes learning science
-            engaging and effective.
-          </p>
-          <Button className="">Explore More</Button>
-
+        <section
+          id="features-section"
+          className="min-h-dvh h-auto w-11/12 flex flex-col justify-around"
+        >
           <div>
+            <h4 className="text-center text-xl my-10 text-gray-600">
+              Features
+            </h4>
+            <h1 className="text-center text-8xl my-10">
+              Why choose <span className={Zalando.className}>SimuLearn</span>?
+            </h1>
+            <p className=" text-center text-xl my-10 text-gray-600">
+              Designed with students in mind, our platform makes learning
+              science engaging and effective.
+            </p>
+            <div className="flex items-center justify-center m-10">
+              <Button className="bg-green-600 text-xl p-8 rounded-full">
+                Explore More
+              </Button>
+            </div>
+          </div>
+          <hr />
+          <div className="flex justify-between gap-20 m-5">
             <div>
-              <h3>Interactive Simulations</h3>
-              <p>
+              <h3 className="my-4 font-bold text-xl">
+                Interactive Simulations
+              </h3>
+              <p className="text-gray-800">
                 Engage with real-time,physics-based stimulations that bring
                 abstract concept to life.
               </p>
             </div>
             <div>
-              <h3>Curriculum Alligned</h3>
-              <p>
+              <h3 className="my-4 font-bold text-xl">Curriculum Alligned</h3>
+              <p className="text-gray-800">
                 All content is carefully designed to match standard educational
                 curricular and learning objective.
               </p>
             </div>
             <div>
-              <h3>Collaborative Learning</h3>
-              <p>
+              <h3 className="my-4 font-bold text-xl">Collaborative Learning</h3>
+              <p className="text-gray-800">
                 Share experiments and insights with classmates and learn
                 together in a supportive environment
               </p>
             </div>
             <div>
-              <h3>Instant Feedback</h3>
-              <p>
+              <h3 className="my-4 font-bold text-xl">Instant Feedback</h3>
+              <p className="text-gray-800">
                 Get immediate results and explanations to understand concepts
                 better and learn from mistakes.
               </p>
             </div>
           </div>
         </section>
-        <section id="advanced-section">
-          <div>
-            <h1>Advanced Learning</h1>
-            <Button>Discover</Button>
+        <section
+          id="advanced-section"
+          className="min-h-dvh h-auto overflow-clip"
+        >
+          <div className="flex justify-between m-20 items-center border-y border-gray-400 py-20">
+            <h1 className="text-8xl">Advanced Learning</h1>
+            <Button className="text-3xl p-11 rounded-full">Discover</Button>
           </div>
-          <div>
+          <div className="flex mx-10 gap-35">
             <div>
-              <h1>01</h1>
-              <h3>Explore Concept Visually</h3>
-              <p>Understand complex topics through interactive simulations instead of memorizing theory.</p>
+              <h1 className="text-9xl mb-12 text-gray-400">01</h1>
+              <h3 className="text-2xl font-bold my-6">
+                Explore Concept Visually
+              </h3>
+              <p className="text-xl text-gray-600 w-4/5">
+                Understand complex topics through interactive simulations
+                instead of memorizing theory.
+              </p>
             </div>
             <div>
-              <h1>02</h1>
-              <h3>Learn By Doing</h3>
-              <p>Experiment , change values and see real-time results to strengthen understanding.</p>
+              <h1 className="text-9xl mb-12 text-gray-400">02</h1>
+              <h3 className="text-2xl font-bold my-6">Learn By Doing</h3>
+              <p className="text-xl text-gray-600 w-4/5">
+                Experiment , change values and see real-time results to
+                strengthen understanding.
+              </p>
             </div>
             <div>
-              <h1>03</h1>
-              <h3>Master with Confidence</h3>
-              <p>Practice until concepts feel natural and apply them easily in exams and real life.</p>
+              <h1 className="text-9xl mb-12 text-gray-400">03</h1>
+              <h3 className="text-2xl font-bold my-6">
+                Master with Confidence
+              </h3>
+              <p className="text-xl text-gray-600 w-4/5">
+                Practice until concepts feel natural and apply them easily in
+                exams and real life.
+              </p>
             </div>
           </div>
-          <Image src={advPic} alt="Alt Image"></Image>
+          <div className="h-auto">
+            <Image src={advPic} alt="Alt Image"></Image>
+          </div>
+          <hr />
         </section>
         <section>
           <h1>Ready to Start Your Science Journey</h1>
-          <p>Join thousands of students already exploring and mastering science through interactive learning.</p>
+          <p>
+            Join thousands of students already exploring and mastering science
+            through interactive learning.
+          </p>
           <Button>Get Started↗</Button>
         </section>
       </main>
@@ -258,7 +305,7 @@ function SubjectCard({
   return (
     <div className="flex flex-col w-[20vw] justify-between">
       <Image alt={altText} src={src}></Image>
-      <h3 className="font-bold">{subjectName}</h3>
+      <h3 className="font-bold text-xl">{subjectName}</h3>
       <p>{description}</p>
     </div>
   );

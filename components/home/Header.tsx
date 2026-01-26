@@ -19,10 +19,10 @@ const Header = () => {
   return (
     <header className="w-full ">
       <Navbar />
-      <h1 className="text-9xl text-center m-20">
+      <h1 className="text-9xl text-center m-40">
         Make <span className={formal.className}>Learning</span> <br />More <span className={Zalando.className}>Interactive.</span>
       </h1>
-      <div className="hero-image">
+      <div className="hero-image mb-10">
         <Image alt="hero image" src={HeroImage} loading="eager" />
       </div>
     </header>
