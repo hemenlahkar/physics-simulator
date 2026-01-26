@@ -11,7 +11,9 @@ import MathPic from "@/public/mathsPic.jpg";
 import ChemPic from "@/public/chemPic.jpg";
 import BioPic from "@/public/bioPic.jpg";
 import myNigga from "@/public/smillingnigga.jpg";
-import { Inter, Petit_Formal_Script } from "next/font/google";
+import advPic from "@/public/advLearn.jpg";
+import { Zalando_Sans_Expanded, Petit_Formal_Script } from "next/font/google";
+import { Button } from "@/components/ui/button";
 
 class SubjectCardCls {
   subjectName: string;
@@ -35,7 +37,13 @@ class SubjectCardCls {
 const formal = Petit_Formal_Script({
   subsets: ["latin"],
   weight: "400",
-  display: "swap"
+  display: "swap",
+});
+
+const Zalando = Zalando_Sans_Expanded({
+  subsets: ["latin"],
+  weight: "700",
+  display: "swap",
 });
 
 export default function Home() {
@@ -96,15 +104,17 @@ export default function Home() {
         />
         <section className="text-center w-full">
           <h1 className="text-7xl ">
-            Explore Science Through{" "}
-            <span className={"text-orange-400 " + formal.className}>Interactive Simulations</span>
+            Explore <span className={Zalando.className}>Science</span> Through{" "}
+            <span className={"text-orange-400 " + formal.className}>
+              Interactive Simulations
+            </span>
           </h1>
           <p>
             Master physics, chemistry, math and biology with hadns-on virtual
             experiments and simulations designed for students
           </p>
         </section>
-        <section id="benefits-section" className="w-full p-10 min-h-dvh">
+        <section id="benefits-section" className="w-full p-10">
           <div className="my-20">
             <p>Subjects to Interact</p>
             <h2 className="text-5xl my-4">Made Learning A Lot Fun...</h2>
@@ -112,7 +122,7 @@ export default function Home() {
               SimuLearn provides easy interaction, without the overloading data
             </p>
           </div>
-          <div className="flex gap-8 justify-evenly">
+          <div className="flex gap-8 justify-evenly mb-8">
             {arrayOfSubject.map((a, index) => (
               <SubjectCard
                 key={index}
@@ -123,39 +133,116 @@ export default function Home() {
               />
             ))}
           </div>
+          <hr />
+          <div className="flex gap-5 justify-between w-full p-10 mt-9 min-h-dvh">
+            <aside>
+              <h1 className="text-7xl">
+                Interactive <span className={formal.className}>Learning</span>{" "}
+                Platform
+              </h1>
+              <ol className="min-h-125 flex flex-col justify-evenly mx-5 text-2xl">
+                <hr />
+                <li>
+                  <span className="font-bold text-gray-600 mr-8">01</span>See
+                  the Bigger Picture of Learning Through Interactive
+                  Exploration.
+                </li>
+                <hr />
+                <li>
+                  <span className="font-bold text-gray-600 mr-8">02</span>
+                  Understand Concepts Clearly by Visualizing How They Actually
+                  Work.
+                </li>
+                <hr />
+                <li>
+                  <span className="font-bold text-gray-600 mr-8">03</span>Move
+                  Beyond Memorization and Learn Through Real Understanding.
+                </li>
+                <hr />
+                <li>
+                  <span className="font-bold text-gray-600 mr-8">04</span>
+                  Experience Learning by Exploring Concepts Step by Step.
+                </li>
+                <hr />
+              </ol>
+            </aside>
+            <aside>
+              <Image
+                alt="Interactive Learning Platform"
+                src={myNigga}
+                width="900"
+              ></Image>
+            </aside>
+          </div>
         </section>
-        <section className="flex gap-5 justify-between w-full p-10 min-h-dvh">
-          <aside>
-            <h1 className="text-8xl">
-              Interactive <span className={formal.className}>Learning</span> Platform
-            </h1>
-            <ol className="min-h-125 flex flex-col justify-evenly mx-5 text-2xl">
-              <li>
-                <span className="font-bold text-gray-600 mr-8">01</span>See the
-                Bigger Picture of Learning Through Interactive Exploration.
-              </li>
-              <li>
-                <span className="font-bold text-gray-600 mr-8">02</span>
-                Understand Concepts Clearly by Visualizing How They Actually
-                Work.
-              </li>
-              <li>
-                <span className="font-bold text-gray-600 mr-8">03</span>Move
-                Beyond Memorization and Learn Through Real Understanding.
-              </li>
-              <li>
-                <span className="font-bold text-gray-600 mr-8">04</span>
-                Experience Learning by Exploring Concepts Step by Step.
-              </li>
-            </ol>
-          </aside>
-          <aside>
-            <Image
-              alt="Interactive Learning Platform"
-              src={myNigga}
-              width="900"
-            ></Image>
-          </aside>
+        <section id="features-section" className="">
+          <h4 className="text-center">Features</h4>
+          <h1 className="text-center">Why choose SimuLearn?</h1>
+          <p>
+            Designed with students in mind, our platform makes learning science
+            engaging and effective.
+          </p>
+          <Button className="">Explore More</Button>
+
+          <div>
+            <div>
+              <h3>Interactive Simulations</h3>
+              <p>
+                Engage with real-time,physics-based stimulations that bring
+                abstract concept to life.
+              </p>
+            </div>
+            <div>
+              <h3>Curriculum Alligned</h3>
+              <p>
+                All content is carefully designed to match standard educational
+                curricular and learning objective.
+              </p>
+            </div>
+            <div>
+              <h3>Collaborative Learning</h3>
+              <p>
+                Share experiments and insights with classmates and learn
+                together in a supportive environment
+              </p>
+            </div>
+            <div>
+              <h3>Instant Feedback</h3>
+              <p>
+                Get immediate results and explanations to understand concepts
+                better and learn from mistakes.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section id="advanced-section">
+          <div>
+            <h1>Advanced Learning</h1>
+            <Button>Discover</Button>
+          </div>
+          <div>
+            <div>
+              <h1>01</h1>
+              <h3>Explore Concept Visually</h3>
+              <p>Understand complex topics through interactive simulations instead of memorizing theory.</p>
+            </div>
+            <div>
+              <h1>02</h1>
+              <h3>Learn By Doing</h3>
+              <p>Experiment , change values and see real-time results to strengthen understanding.</p>
+            </div>
+            <div>
+              <h1>03</h1>
+              <h3>Master with Confidence</h3>
+              <p>Practice until concepts feel natural and apply them easily in exams and real life.</p>
+            </div>
+          </div>
+          <Image src={advPic} alt="Alt Image"></Image>
+        </section>
+        <section>
+          <h1>Ready to Start Your Science Journey</h1>
+          <p>Join thousands of students already exploring and mastering science through interactive learning.</p>
+          <Button>Get Started↗</Button>
         </section>
       </main>
     </>
