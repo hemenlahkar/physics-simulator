@@ -12,7 +12,8 @@ import ChemPic from "@/public/chemPic.jpg";
 import BioPic from "@/public/bioPic.jpg";
 import myNigga from "@/public/smillingnigga.jpg";
 import advPic from "@/public/advLearn.jpg";
-import { Zalando_Sans_Expanded, Petit_Formal_Script } from "next/font/google";
+import logo from "@/public/logo.jpg";
+import { Zalando_Sans_Expanded, Petit_Formal_Script, Red_Rose } from "next/font/google";
 import { Button } from "@/components/ui/button";
 
 class SubjectCardCls {
@@ -43,6 +44,12 @@ const formal = Petit_Formal_Script({
 const Zalando = Zalando_Sans_Expanded({
   subsets: ["latin"],
   weight: "700",
+  display: "swap",
+});
+
+const rrose = Red_Rose({
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -111,20 +118,21 @@ export default function Home() {
               Interactive Simulations
             </span>
           </h1>
-          <p>
+          <p className="my-10 text-xl">
             Master physics, chemistry, math and biology with hadns-on virtual
             experiments and simulations designed for students
           </p>
         </section>
         <section id="benefits-section" className="w-full p-10">
-          <div className="my-20">
-            <p>Subjects to Interact</p>
-            <h2 className="text-5xl my-4">Made Learning A Lot Fun...</h2>
-            <p>
+          <div className="my-20 text-center">
+            <p className={`mb-12 ${rrose.className}`}>Subjects to Interact</p>
+            <h2 className="text-5xl my-4 mb-12">Made <span className={formal.className}>Learning</span> A Lot Fun...</h2>
+            <p className={`mb-12 ${rrose.className}`}>
               SimuLearn provides easy interaction, without the overloading data
             </p>
           </div>
-          <div className="flex gap-8 justify-evenly mb-8">
+          <hr />
+          <div className="flex gap-8 justify-evenly mb-8 mt-10">
             {arrayOfSubject.map((a, index) => (
               <SubjectCard
                 key={index}
@@ -201,7 +209,7 @@ export default function Home() {
               science engaging and effective.
             </p>
             <div className="flex items-center justify-center m-10">
-              <Button className="bg-green-600 text-xl p-8 rounded-full">
+              <Button className="bg-lime-800 text-xl p-8 rounded-full">
                 Explore More
               </Button>
             </div>
@@ -246,7 +254,7 @@ export default function Home() {
         >
           <div className="flex justify-between m-20 items-center border-y border-gray-400 py-20">
             <h1 className="text-8xl">Advanced Learning</h1>
-            <Button className="text-3xl p-11 rounded-full">Discover</Button>
+            <Button className="text-3xl p-11 rounded-full bg-lime-800">Discover</Button>
           </div>
           <div className="flex mx-10 gap-35">
             <div>
@@ -278,20 +286,34 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="h-auto">
+          <div className="h-auto mt-20">
             <Image src={advPic} alt="Alt Image"></Image>
           </div>
-          <hr />
         </section>
-        <section>
-          <h1>Ready to Start Your Science Journey</h1>
-          <p>
+        <section className="text-center my-15 mb-40">
+          <h1 className={`text-5xl my-10 font-bold ${rrose.className}`}>Ready to Start Your Science Journey?</h1>
+          <p className="text-gray-400 my-10">
             Join thousands of students already exploring and mastering science
             through interactive learning.
           </p>
-          <Button>Get Started↗</Button>
+          <Button className="rounded-full text-9xl px-60 py-5 bg-lime-800"><span className="text-xl">Get started↗</span></Button>
         </section>
       </main>
+      <hr />
+      <footer />
+        <section className="w-full p-10">
+          <div className={`flex gap-8 font-bold`}>
+            <h1>Subjects</h1>
+            <h1>Features</h1>
+            <h1>Advanced Learning</h1>
+          </div>
+          <div className="mt-30 flex gap-10">
+            <Image src={logo} alt="SimuLearn Logo"></Image>
+            <p className="mt-12">© Simulearn.   2026</p>
+            <p className="mt-12">All Rights Reserved</p>
+          </div>
+        </section>
+
     </>
   );
 }
