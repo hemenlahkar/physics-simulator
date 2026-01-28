@@ -13,8 +13,14 @@ import BioPic from "@/public/bioPic.jpg";
 import myNigga from "@/public/smillingnigga.jpg";
 import advPic from "@/public/advLearn.jpg";
 import logo from "@/public/logo.jpg";
-import { Zalando_Sans_Expanded, Petit_Formal_Script, Red_Rose } from "next/font/google";
+import {
+  Zalando_Sans_Expanded,
+  Petit_Formal_Script,
+  Red_Rose,
+} from "next/font/google";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import ExploreDialog from "@/components/home/ExpoloreDialog";
 
 class SubjectCardCls {
   subjectName: string;
@@ -55,6 +61,7 @@ const rrose = Red_Rose({
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExploreOpen, setIsExploreOpen] = useState(false);
   const router = useRouter();
 
   const handleClose = () => {
@@ -102,9 +109,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main
-      className="flex items-center justify-start gap-10 min-h-screen flex-col flex-1"
-      >
+      <main className="flex items-center justify-start gap-10 min-h-screen flex-col flex-1">
         <SelectSubjectDialog
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
@@ -126,7 +131,10 @@ export default function Home() {
         <section id="benefits-section" className="w-full p-10">
           <div className="my-20 text-center">
             <p className={`mb-12 ${rrose.className}`}>Subjects to Interact</p>
-            <h2 className="text-5xl my-4 mb-12">Made <span className={formal.className}>Learning</span> A Lot Fun...</h2>
+            <h2 className="text-5xl my-4 mb-12">
+              Made <span className={formal.className}>Learning</span> A Lot
+              Fun...
+            </h2>
             <p className={`mb-12 ${rrose.className}`}>
               SimuLearn provides easy interaction, without the overloading data
             </p>
@@ -209,9 +217,12 @@ export default function Home() {
               science engaging and effective.
             </p>
             <div className="flex items-center justify-center m-10">
-              <Button className="bg-lime-800 text-xl p-8 rounded-full">
+              <Link
+                href="/explore"
+                className="bg-lime-700 hover:bg-lime-800 text-xl px-8 py-6 text-white rounded-full cursor-pointer"
+              >
                 Explore More
-              </Button>
+              </Link>
             </div>
           </div>
           <hr />
@@ -254,7 +265,11 @@ export default function Home() {
         >
           <div className="flex justify-between m-20 items-center border-y border-gray-400 py-20">
             <h1 className="text-8xl">Advanced Learning</h1>
-            <Button className="text-3xl p-11 rounded-full bg-lime-800">Discover</Button>
+            <ExploreDialog
+              isOpen={isExploreOpen}
+              setIsOpen={setIsExploreOpen}
+              onClose={() => setIsExploreOpen(false)}
+            />
           </div>
           <div className="flex mx-10 gap-35">
             <div>
@@ -291,29 +306,37 @@ export default function Home() {
           </div>
         </section>
         <section className="text-center my-15 mb-40">
-          <h1 className={`text-5xl my-10 font-bold ${rrose.className}`}>Ready to Start Your Science Journey?</h1>
+          <h1 className={`text-5xl my-10 font-bold ${rrose.className}`}>
+            Ready to Start Your Science Journey?
+          </h1>
           <p className="text-gray-400 my-10">
             Join thousands of students already exploring and mastering science
             through interactive learning.
           </p>
-          <Button className="rounded-full text-9xl px-60 py-5 bg-lime-800"><span className="text-xl">Get started↗</span></Button>
+          <Button className="rounded-full text-9xl px-60 py-5 bg-lime-800">
+            <span className="text-xl">Get started↗</span>
+          </Button>
         </section>
       </main>
-      <hr />
-      <footer />
+      <div className="w-[90vw] ml-[5vw]">
+        <hr />
+      </div>
+      <footer>
         <section className="w-full p-10">
           <div className={`flex gap-8 font-bold`}>
             <h1>Subjects</h1>
             <h1>Features</h1>
             <h1>Advanced Learning</h1>
           </div>
-          <div className="mt-30 flex gap-10">
-            <Image src={logo} alt="SimuLearn Logo"></Image>
-            <p className="mt-12">© Simulearn.   2026</p>
+          <div className="mt-30 flex gap-10 justify-between items-end">
+            <div>
+              <Image src={logo} alt="SimuLearn Logo"></Image>
+              <p className="mt-12">© Simulearn. 2026</p>
+            </div>
             <p className="mt-12">All Rights Reserved</p>
           </div>
         </section>
-
+      </footer>
     </>
   );
 }

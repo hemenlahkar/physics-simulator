@@ -22,19 +22,17 @@ export enum Subjects {
   BIOLOGY = "biology",
 }
 
-interface SelectSubjectDialogProps {
+interface ExploreDialogProps {
   isOpen: boolean;
-  setIsOpen: (e : boolean) => void;
+  setIsOpen: (e: boolean) => void;
   onClose: () => void;
-  onSubmit: (data: Subjects | null) => FormEventHandler | undefined;
 }
 
-const SelectSubjectDialog = ({
+const ExploreDialog = ({
   isOpen,
   setIsOpen,
   onClose,
-  onSubmit,
-}: SelectSubjectDialogProps) => {
+}: ExploreDialogProps) => {
   const [subject, setSubject] = useState<Subjects | null>(Subjects.PHYSICS);
   return (
     <Dialog
@@ -46,34 +44,41 @@ const SelectSubjectDialog = ({
         }
       }}
     >
-      <form
-        onSubmit={(e) => {
-          onSubmit(subject);
-        }}
-      >
+      <form>
         <DialogTrigger asChild>
           <Button
             variant="outline"
             onClick={() => {
-                setIsOpen(true)
+              setIsOpen(true);
             }}
             className="text-3xl p-11 rounded-full bg-lime-800 text-white outline-none border-none"
           >
-            See Simulations
+            Discover
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Select Subject</DialogTitle>
-            <DialogDescription>
-              Select the subject to see the available simulations
-            </DialogDescription>
+            <DialogTitle>Other Website with similar motive</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="name-1">Subject</Label>
-              <Dropdown subject={subject} setSubject={setSubject} />
-            </div>
+            <ul className="grid gap-3 list-disc">
+              <li>
+                <a
+                  href="https://phet.colorado.edu/en/simulations/filter?type=html"
+                  className="text-2xl text-blue-400"
+                >
+                  Phet
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://olabs.edu.in/"
+                  className="text-2xl text-blue-400"
+                >
+                  Olab
+                </a>
+              </li>
+            </ul>
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -86,9 +91,6 @@ const SelectSubjectDialog = ({
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" onClick={() => {
-                onSubmit(subject)
-            }}>Continue</Button>
           </DialogFooter>
         </DialogContent>
       </form>
@@ -96,4 +98,4 @@ const SelectSubjectDialog = ({
   );
 };
 
-export default SelectSubjectDialog;
+export default ExploreDialog;
